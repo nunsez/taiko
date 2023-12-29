@@ -1,0 +1,30 @@
+{
+    "dockerComposeFile": "../compose.yml",
+    "service": "app",
+    "workspaceFolder": "/app",
+    "shutdownAction": "none",
+    "overrideCommand": true,
+
+    "remoteUser": "dev",
+    "containerUser": "dev",
+    "updateRemoteUserUID": true,
+
+    "customizations": {
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                "jakebecker.elixir-ls",
+                "pantajoe.vscode-elixir-credo",
+                "kaiwood.endwise",
+                "phoenixframework.phoenix",
+                "editorconfig.editorconfig",
+                "eamodio.gitlens",
+                "oderwat.indent-rainbow"
+            ],
+            // Set *default* container specific settings.json values on container create.
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
