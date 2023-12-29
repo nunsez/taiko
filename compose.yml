@@ -1,0 +1,23 @@
+---
+name: "dex"
+
+services:
+  app:
+    build:
+      context: "./"
+      dockerfile: "./Dockerfile.dev"
+      args:
+        - "ELIXIR_VERSION=1.16.0-slim"
+        - "USER_ID=${USER_ID:-1000}"
+    working_dir: "/app"
+    command: "/bin/bash"
+    restart: "unless-stopped"
+    user: "dev"
+    tty: true
+    stdin_open: true
+    volumes:
+      - type: "bind"
+        source: "./"
+        target: "/app"
+        read_only: false
+...

@@ -1,0 +1,31 @@
+ARG ELIXIR_VERSION
+FROM "elixir:${ELIXIR_VERSION}"
+
+# install build dependencies
+RUN apt-get update --yes && apt-get install --yes \
+    build-essential \
+    curl \
+    exiftool \
+    git \
+    locales \
+    make \
+    nano \
+    vim \
+    && apt-get clean
+
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US:en"
+ENV LC_ALL="en_US.UTF-8"
+
+# install hex + rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+# Create docker user with non-root privilegies
+ARG USER_ID="1000"
+RUN useradd dev --create-home --uid="${USER_ID}"
+USER ${USER_ID}
+
+WORKDIR /app
