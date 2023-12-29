@@ -18,12 +18,12 @@
                 "kaiwood.endwise",
                 "phoenixframework.phoenix",
                 "editorconfig.editorconfig",
-                "eamodio.gitlens",
-                "oderwat.indent-rainbow"
+                "eamodio.gitlens"
             ],
             // Set *default* container specific settings.json values on container create.
             "settings": {
-                "terminal.integrated.defaultProfile.linux": "bash"
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "elixirLS.suggestSpecs": false
             }
         }
     }
