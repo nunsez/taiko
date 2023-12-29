@@ -9,7 +9,13 @@ defmodule Taiko.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        ignore_warnings: nil,
+        plt_add_apps: [:mix, :ex_unit],
+        plt_core_path: "priv/plts/core.plt",
+        plt_local_path: "priv/plts/project.plt"
+      ]
     ]
   end
 
@@ -52,6 +58,7 @@ defmodule Taiko.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
 
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end

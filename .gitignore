@@ -34,3 +34,7 @@ taiko-*.tar
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
+
+# Ignore dialyzer https://hexdocs.pm/dialyxir/readme.html#continuous-integration
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
