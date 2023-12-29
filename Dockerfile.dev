@@ -19,13 +19,13 @@ ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US:en"
 ENV LC_ALL="en_US.UTF-8"
 
-# install hex + rebar
-RUN mix local.hex --force && \
-    mix local.rebar --force
-
 # Create docker user with non-root privilegies
 ARG USER_ID="1000"
 RUN useradd dev --create-home --uid="${USER_ID}"
 USER ${USER_ID}
+
+# install hex + rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
 
 WORKDIR /app

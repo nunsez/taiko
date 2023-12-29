@@ -1,5 +1,5 @@
 ---
-name: "dex"
+name: "taiko"
 
 services:
   app:
@@ -10,7 +10,7 @@ services:
         - "ELIXIR_VERSION=1.16.0-slim"
         - "USER_ID=${USER_ID:-1000}"
     working_dir: "/app"
-    command: "/bin/bash"
+    command: "mix phx.server"
     restart: "unless-stopped"
     user: "dev"
     tty: true
@@ -20,4 +20,30 @@ services:
         source: "./"
         target: "/app"
         read_only: false
+    ports:
+      - "4000:4000"
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  db:
+    image: "postgres:15.5"
+    restart: "unless-stopped"
+    environment:
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_DB=taiko_dev"
+    volumes:
+      - type: "volume"
+        source: "pg_data"
+        target: "/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD", "pg_isready", "--quiet", "--dbname", "taiko_dev", "--username", "postgres"]
+      timeout: "45s"
+      interval: "10s"
+      retries: 10
+
+volumes:
+  pg_data:
+    driver: "local"
 ...
