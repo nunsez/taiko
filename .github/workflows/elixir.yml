@@ -16,7 +16,23 @@ permissions:
   contents: "read"
 
 jobs:
-  build:
+  test:
+    # Set up a Postgres DB service. By default, Phoenix applications
+    # use Postgres. This creates a database for running tests.
+    services:
+      db:
+        image: "postgres:15.5"
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     runs-on: "ubuntu-latest"
     name: "OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}"
     strategy:
