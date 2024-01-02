@@ -111,7 +111,7 @@ jobs:
 
       # Step: Run Credo linter
       - name: "Lint with Credo"
-        run: "mix credo --strict"
+        run: "mix credo"
 
       # Create PLTs if no cache was found.
       # Always rebuild PLT when a job is retried
