@@ -122,7 +122,7 @@ jobs:
 
       # Step: Run Dialyzer check
       - name: "Run dialyzer"
-        run: "mix dialyzer --format github --no-check --halt-exit-status"
+        run: "mix dialyzer --no-check --format github"
 
       # Step: Execute the tests.
       - name: "Run tests"
