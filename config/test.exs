@@ -6,11 +6,10 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :taiko, Taiko.Repo,
-  url:
-    System.get_env(
-      "DATABASE_URL",
-      "postgresql://postgres:postgres@db:5432/taiko_test#{System.get_env("MIX_TEST_PARTITION")}"
-    ),
+  username: System.get_env("TAIKO_DATABASE_USERNAME", "postgres"),
+  password: System.get_env("TAIKO_DATABASE_PASSWORD", "postgres"),
+  hostname: System.get_env("TAIKO_DATABASE_HOSTNAME", "db"),
+  database: "taiko_test#{System.get_env("TAIKO_MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 

@@ -11,10 +11,7 @@ on:
 
 env:
   MIX_ENV: "test"
-  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/taiko_test"
-
-permissions:
-  contents: "read"
+  TAIKO_DATABASE_HOSTNAME: "localhost"
 
 jobs:
   test:
@@ -39,7 +36,6 @@ jobs:
     strategy:
       matrix:
         otp:
-          # - "25.3"
           - "26.2"
         elixir:
           - "1.16.0"
@@ -114,8 +110,7 @@ jobs:
       # Step: Download project dependencies. If unchanged, uses
       # the cached version.
       - name: "Install dependencies"
-        run: |
-          mix deps.get
+        run: "mix deps.get"
 
       # Step: Compile the project treating any warnings as errors.
       - name: "Compiles without warnings"

@@ -2,7 +2,10 @@ import Config
 
 # Configure your database
 config :taiko, Taiko.Repo,
-  url: "postgresql://postgres:postgres@db:5432/taiko_dev",
+  username: System.get_env("TAIKO_DATABASE_USERNAME", "postgres"),
+  password: System.get_env("TAIKO_DATABASE_PASSWORD", "postgres"),
+  hostname: System.get_env("TAIKO_DATABASE_HOSTNAME", "db"),
+  database: "taiko_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
