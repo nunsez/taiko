@@ -1,0 +1,20 @@
+---
+services:
+  devcontainer:
+    build:
+      context: "./"
+      dockerfile: "./Dockerfile.dev"
+      args:
+        - "ELIXIR_VERSION=1.16.0-slim"
+        - "USER_ID=${USER_ID:-1000}"
+    command: "sleep infinity"
+    restart: "no"
+    user: "dev"
+    volumes:
+      - type: "bind"
+        source: "./"
+        target: "/app"
+      - type: "bind"
+        source: "/var/run/docker.sock"
+        target: "/var/run/docker.sock"
+...

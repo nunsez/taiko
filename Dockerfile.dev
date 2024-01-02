@@ -29,4 +29,7 @@ USER ${USER_ID}
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-WORKDIR /app
+ENV PROJECT_ROOT="/app"
+ENV HISTFILE="${PROJECT_ROOT}/tmp/.bash_history"
+
+WORKDIR ${PROJECT_ROOT}
