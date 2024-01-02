@@ -11,6 +11,7 @@ on:
 
 env:
   MIX_ENV: "test"
+  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/taiko_test"
 
 permissions:
   contents: "read"
@@ -143,6 +144,4 @@ jobs:
       # Step: Execute the tests.
       - name: "Run tests"
         run: "mix test"
-        env:
-          DATABASE_URL: "postgresql://postgres:postgres@db:5432/taiko_test"
 ...
