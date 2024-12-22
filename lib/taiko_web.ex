@@ -42,8 +42,9 @@ defmodule TaikoWeb do
         formats: [:html, :json],
         layouts: [html: TaikoWeb.Layouts]
 
+      use Gettext, backend: TaikoWeb.Gettext
+
       import Plug.Conn
-      import TaikoWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -81,11 +82,13 @@ defmodule TaikoWeb do
 
   defp html_helpers do
     quote do
+      # Translation
+      use Gettext, backend: TaikoWeb.Gettext
+
       # HTML escaping functionality
       import Phoenix.HTML
-      # Core UI components and translation
+      # Core UI components
       import TaikoWeb.CoreComponents
-      import TaikoWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -105,7 +108,7 @@ defmodule TaikoWeb do
   end
 
   @doc """
-  When used, dispatch to the appropriate controller/view/etc.
+  When used, dispatch to the appropriate controller/live_view/etc.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])

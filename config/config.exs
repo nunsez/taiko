@@ -9,7 +9,7 @@ import Config
 
 config :taiko,
   ecto_repos: [Taiko.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
 config :taiko, TaikoWeb.Endpoint,
@@ -20,21 +20,12 @@ config :taiko, TaikoWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Taiko.PubSub,
-  live_view: [signing_salt: "jIx2MpRc"]
-
-# Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-config :taiko, Taiko.Mailer, adapter: Swoosh.Adapters.Local
+  live_view: [signing_salt: "x6auGtl/"]
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  default: [
+  taiko: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
@@ -43,8 +34,8 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.3.2",
-  default: [
+  version: "3.4.3",
+  taiko: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css

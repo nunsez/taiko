@@ -10,10 +10,10 @@ defmodule Taiko.Application do
     children = [
       TaikoWeb.Telemetry,
       Taiko.Repo,
+      {Ecto.Migrator,
+       repos: Application.fetch_env!(:taiko, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:taiko, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Taiko.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: Taiko.Finch},
       # Start a worker by calling: Taiko.Worker.start_link(arg)
       # {Taiko.Worker, arg},
       # Start to serve requests, typically the last entry
@@ -32,5 +32,10 @@ defmodule Taiko.Application do
   def config_change(changed, _new, removed) do
     TaikoWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp skip_migrations?() do
+    # By default, sqlite migrations are run when using a release
+    System.get_env("RELEASE_NAME") != nil
   end
 end

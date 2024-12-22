@@ -36,9 +36,9 @@ jobs:
     strategy:
       matrix:
         otp:
-          - "26.2"
+          - "27.2"
         elixir:
-          - "1.16.0"
+          - "1.18.0"
 
     steps:
       # Step: Setup Elixir + Erlang image as the base.
@@ -80,21 +80,6 @@ jobs:
             ${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-mix-${{env.cache-name}}-${{hashFiles('**/mix.lock')}}
             ${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-mix-${{env.cache-name}}-
 
-      # Don't cache PLTs based on mix.lock hash, as Dialyzer can incrementally update even old ones
-      # Cache key based on Elixir & Erlang version (also useful when running in matrix)
-      - name: "Restore PLT cache"
-        id: "cache-plt"
-        uses: "actions/cache@v3"
-        env:
-          cache-name: "cache-plt"
-        with:
-          path: "priv/plts"
-          key: "${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-plts-${{env.cache-name}}-${{hashFiles('/mix.lock')}}-${{hashFiles('**/*.ex')}}"
-          restore-keys: |
-            ${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-plts-${{env.cache-name}}-${{hashFiles('/mix.lock')}}-${{hashFiles('**/*.ex')}}
-            ${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-plts-${{env.cache-name}}-${{hashFiles('/mix.lock')}}-
-            ${{runner.os}}-${{matrix.otp}}-${{matrix.elixir}}-plts-${{env.cache-name}}-
-
       # Step: Conditionally bust the cache when job is re-run.
       # Sometimes, we may have issues with incremental builds that are fixed by
       # doing a full recompile. In order to not waste dev time on such trivial
@@ -124,17 +109,6 @@ jobs:
       # Step: Run Credo linter
       - name: "Lint with Credo"
         run: "mix credo"
-
-      # Create PLTs if no cache was found.
-      # Always rebuild PLT when a job is retried
-      # If they were cached at all, they'll be updated when we run mix dialyzer with no flags.
-      - name: "Create PLTs"
-        if: steps.cache-plt.outputs.cache-hit != 'true' || github.run_attempt != '1'
-        run: "mix dialyzer --plt"
-
-      # Step: Run Dialyzer check
-      - name: "Run dialyzer"
-        run: "mix dialyzer --no-check --format github"
 
       # Step: Execute the tests.
       - name: "Run tests"
