@@ -3,4 +3,4 @@ ERL_AFLAGS = "-kernel shell_history enabled"
 
 [tools]
 erlang = "27.2"
-elixir = "1.18.0-otp-27"
+elixir = "1.18.1-otp-27"
