@@ -9,3 +9,8 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias Taiko.Repo
+alias Taiko.Accounts.User
+
+Repo.insert!(%User{email: "admin@admin.com", hashed_password: Bcrypt.hash_pwd_salt("password")})
