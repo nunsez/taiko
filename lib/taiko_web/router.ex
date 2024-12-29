@@ -39,6 +39,18 @@ defmodule TaikoWeb.Router do
   end
 
   scope "/", TaikoWeb do
+    pipe_through [:browser]
+
+    # get "/", PageController, :home
+
+    delete "/users/log_out", UserSessionController, :delete
+
+    # live_session :current_user,
+    #   on_mount: [{TaikoWeb.UserAuth, :mount_current_user}] do
+    # end
+  end
+
+  scope "/", TaikoWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
@@ -53,20 +65,10 @@ defmodule TaikoWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{TaikoWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [{TaikoWeb.UserAuth, :ensure_authenticated}],
+      layout: {TaikoWeb.Layouts, :live} do
+      live "/", ProfileLive, :show
       live "/users/settings", UserSettingsLive, :edit
     end
-  end
-
-  scope "/", TaikoWeb do
-    pipe_through [:browser]
-
-    get "/", PageController, :home
-
-    delete "/users/log_out", UserSessionController, :delete
-
-    # live_session :current_user,
-    #   on_mount: [{TaikoWeb.UserAuth, :mount_current_user}] do
-    # end
   end
 end
