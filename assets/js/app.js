@@ -22,10 +22,42 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+const Hooks = {};
+
+Hooks.AudioPlayer = {
+  mounted() {
+    this.player = this.el.querySelector("audio");
+
+    this.handleEvent("play2", ({ token }) => {
+      this.player.src = `/files/${token}`;
+
+      this.player.play().then(() => {
+        this.updateProgress();
+      });
+    });
+  },
+
+  updateProgress() {
+    if (isNaN(this.player.duration)) {
+      clearTimeout(this.progressTimer);
+      return;
+    }
+
+    if (this.player.currentTime >= this.player.duration) {
+      this.pushEvent("next_song_auto");
+      clearTimeout(this.progressTimer);
+      return;
+    }
+
+    this.progressTimer = setTimeout(() => this.updateProgress(), 100);
+  }
+};
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

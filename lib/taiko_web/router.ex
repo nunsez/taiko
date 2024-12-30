@@ -42,7 +42,7 @@ defmodule TaikoWeb.Router do
     pipe_through [:browser]
 
     # get "/", PageController, :home
-
+    get "/files/:token", FileController, :show
     delete "/users/log_out", UserSessionController, :delete
 
     # live_session :current_user,

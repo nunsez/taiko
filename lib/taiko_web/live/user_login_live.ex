@@ -13,7 +13,12 @@ defmodule TaikoWeb.UserLoginLive do
         <.input field={@form[:password]} type="password" label="Password" required />
 
         <:actions>
-          <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" checked={true} />
+          <.input
+            field={@form[:remember_me]}
+            type="checkbox"
+            label="Keep me logged in"
+            checked={true}
+          />
         </:actions>
         <:actions>
           <.button phx-disable-with="Logging in..." class="w-full">
