@@ -26,7 +26,7 @@ defmodule TaikoWeb.PlayerLive do
       Song
       |> order_by(fragment("RANDOM()"))
       |> limit(1)
-      |> Repo.one!
+      |> Repo.one!()
 
     {:noreply, ProfileLive.play_song(socket, song)}
   end
