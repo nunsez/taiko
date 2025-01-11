@@ -96,4 +96,5 @@ end
 
 config :taiko, Taiko.Listener,
   enabled: config_env() != :test,
-  dirs: [Path.expand("~/Music")]
+  dirs: [Path.expand("~/Music")],
+  interval: :timer.seconds(10)

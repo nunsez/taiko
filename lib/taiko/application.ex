@@ -45,8 +45,8 @@ defmodule Taiko.Application do
     config = Application.get_env(:taiko, Taiko.Listener)
 
     if config[:enabled] do
-      spec = {Taiko.Listener, dirs: config[:dirs] || []}
-      [spec | children]
+      opts = [dirs: config[:dirs], interval: config[:interval]]
+      [{Taiko.Listener, opts} | children]
     else
       children
     end

@@ -21,7 +21,16 @@ defmodule Taiko.MediaLibrary.Song do
   end
 
   @required [:name, :file_path, :file_size, :md5_hash]
-  @optional [:duration, :bitrate, :disc_number, :track_number, :year, :picture_data, :picture_mime]
+
+  @optional [
+    :duration,
+    :bitrate,
+    :disc_number,
+    :track_number,
+    :year,
+    :picture_data,
+    :picture_mime
+  ]
 
   def from_file(file_path, stat, tag) do
     %{

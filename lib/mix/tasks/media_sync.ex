@@ -10,12 +10,14 @@ defmodule Mix.Tasks.MediaSync do
   def run(_args) do
     # Mix.Task.run "app.start"
     Application.ensure_all_started(:taiko)
+
     added_hashes =
       files()
       |> Stream.map(&handle_file/1)
       |> Stream.filter(&success?/1)
       |> Stream.map(fn {:ok, md5_hash} -> md5_hash end)
       |> Enum.to_list()
+
     cleanup(added_hashes)
   end
 
@@ -69,6 +71,7 @@ defmodule Mix.Tasks.MediaSync do
 
   def cleanup(hashes) do
     import Ecto.Query
+
     Song
     |> where([s], s.md5_hash not in ^hashes)
     |> Repo.delete_all()
