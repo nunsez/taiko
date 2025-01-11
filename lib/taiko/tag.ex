@@ -179,7 +179,7 @@ defmodule Taiko.Tag do
     {data, nil}
   end
 
-  def m4a_numbers(data) when is_binary(data) do
+  def m4a_numbers(data) do
     case Regex.run(~r"(\d+) of (\d+)", to_string(data)) do
       [_, current, total] ->
         {parse_integer(current), parse_integer(total)}

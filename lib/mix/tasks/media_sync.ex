@@ -1,4 +1,5 @@
 defmodule Mix.Tasks.MediaSync do
+  alias Taiko.TagReader
   alias Taiko.Repo
   alias Taiko.MediaLibrary.Song
 
@@ -9,8 +10,17 @@ defmodule Mix.Tasks.MediaSync do
   def run(_args) do
     # Mix.Task.run "app.start"
     Application.ensure_all_started(:taiko)
-    Enum.each(files(), &handle_file/1)
+    added_hashes =
+      files()
+      |> Stream.map(&handle_file/1)
+      |> Stream.filter(&success?/1)
+      |> Stream.map(fn {:ok, md5_hash} -> md5_hash end)
+      |> Enum.to_list()
+    cleanup(added_hashes)
   end
+
+  def success?({:ok, _md5_hash}), do: true
+  def success?(_), do: false
 
   def files do
     formats = Enum.join(@formats, ",")
@@ -21,32 +31,31 @@ defmodule Mix.Tasks.MediaSync do
   def handle_file(file_path) do
     with {:ok, stat} <- File.stat(file_path),
          :ok <- check_stat(stat),
-         {:ok, content} <- File.read(file_path) do
-      content_hash = hash(content)
-      file_path_hash = hash(file_path)
-
-      attrs = %{
-        name: file_path,
-        content_hash: content_hash,
-        file_path: file_path,
-        file_path_hash: file_path_hash,
-        file_size: stat.size
-      }
-
+         {:ok, tag} <- TagReader.read_file(file_path) do
+      attrs = Song.from_file(file_path, stat, tag)
       sync(attrs)
     end
   end
 
   def sync(attrs) do
-    case Repo.get_by(Song, content_hash: attrs[:content_hash]) do
-      nil ->
-        case Repo.get_by(Song, file_path_hash: attrs[:file_path_hash]) do
-          nil -> insert(attrs)
-          song -> update(song, attrs)
-        end
+    md5_hash = attrs[:md5_hash]
 
-      song ->
-        update(song, attrs)
+    result =
+      md5_hash
+      |> get_song()
+      |> Song.changeset(attrs)
+      |> Repo.insert_or_update()
+
+    case result do
+      {:ok, _} -> {:ok, md5_hash}
+      error -> error
+    end
+  end
+
+  def get_song(md5_hash) do
+    case Repo.get_by(Song, md5_hash: md5_hash) do
+      nil -> %Song{md5_hash: md5_hash}
+      song -> song
     end
   end
 
@@ -58,26 +67,10 @@ defmodule Mix.Tasks.MediaSync do
     end
   end
 
-  def hash(data) do
-    :crypto.hash(:md5, data)
-    |> Base.encode16(case: :lower)
-  end
-
-  def update(song, attrs) do
-    changeset = Song.changeset(song, attrs)
-
-    case Repo.update(changeset) do
-      {:ok, _} -> :ok
-      {:error, _} -> :error
-    end
-  end
-
-  def insert(attrs) do
-    changeset = Song.changeset(%Song{}, attrs)
-
-    case Repo.insert(changeset) do
-      {:ok, _} -> :ok
-      _ -> :error
-    end
+  def cleanup(hashes) do
+    import Ecto.Query
+    Song
+    |> where([s], s.md5_hash not in ^hashes)
+    |> Repo.delete_all()
   end
 end

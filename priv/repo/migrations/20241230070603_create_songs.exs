@@ -10,10 +10,11 @@ defmodule Taiko.Repo.Migrations.CreateSongs do
       add :disc_number, :integer
       add :track_number, :integer
       add :year, :integer
-      add :content_hash, :string
+      add :picture_data, :string
+      add :picture_mime, :string
       add :file_path, :string
-      add :file_path_hash, :string
       add :file_size, :integer
+      add :md5_hash, :string
 
       timestamps(type: :utc_datetime)
     end
