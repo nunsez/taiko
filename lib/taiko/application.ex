@@ -20,6 +20,8 @@ defmodule Taiko.Application do
       TaikoWeb.Endpoint
     ]
 
+    children = setup_listener(children)
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Taiko.Supervisor]
@@ -37,5 +39,16 @@ defmodule Taiko.Application do
   defp skip_migrations?() do
     # By default, sqlite migrations are run when using a release
     System.get_env("RELEASE_NAME") != nil
+  end
+
+  defp setup_listener(children) do
+    config = Application.get_env(:taiko, Taiko.Listener)
+
+    if config[:enabled] do
+      spec = {Taiko.Listener, dirs: config[:dirs] || []}
+      [spec | children]
+    else
+      children
+    end
   end
 end

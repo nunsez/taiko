@@ -57,6 +57,8 @@ defmodule Taiko.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      # file chages listener
+      {:file_system, "~> 1.0.1"},
 
       # dev deps
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
