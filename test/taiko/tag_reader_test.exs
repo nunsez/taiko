@@ -52,7 +52,6 @@ defmodule Taiko.TagReaderTest do
   describe "mp3" do
     test "returns valid Tag struct" do
       path = "test/support/files/music_root/dir_1/mp3.mp3"
-      path = "/mnt/d/Music/Japanese/2017/Jamil - The Rock City Boy.mp3"
       {:ok, tag} = Taiko.TagReader.read_file(path)
 
       assert %Tag{
