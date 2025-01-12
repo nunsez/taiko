@@ -2,6 +2,9 @@ defmodule Taiko.MediaLibrary.Song do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Taiko.MediaLibrary.Artist
+  alias Taiko.MediaLibrary.SongArtist
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "songs" do
@@ -16,6 +19,10 @@ defmodule Taiko.MediaLibrary.Song do
     field :file_path, :string
     field :file_size, :integer
     field :md5_hash, :string
+
+    has_many :song_artists, SongArtist, on_delete: :delete_all
+
+    many_to_many :artists, Artist, join_through: SongArtist
 
     timestamps(type: :utc_datetime)
   end
