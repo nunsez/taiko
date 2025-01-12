@@ -1,7 +1,12 @@
 defmodule Mix.Tasks.MediaSync do
+  alias Taiko.MediaLibrary.SongArtist
+  alias Ecto.Multi
+  alias Taiko.MediaLibrary.Artist
   alias Taiko.TagReader
   alias Taiko.Repo
   alias Taiko.MediaLibrary.Song
+
+  import Ecto.Query
 
   @root Path.expand("~/Music")
 
@@ -15,13 +20,13 @@ defmodule Mix.Tasks.MediaSync do
       files()
       |> Stream.map(&handle_file/1)
       |> Stream.filter(&success?/1)
-      |> Stream.map(fn {:ok, md5_hash} -> md5_hash end)
+      |> Stream.map(fn {:ok, data} -> data.insert_or_update_song.md5_hash end)
       |> Enum.to_list()
 
     cleanup(added_hashes)
   end
 
-  def success?({:ok, _md5_hash}), do: true
+  def success?({:ok, _data}), do: true
   def success?(_), do: false
 
   def files do
@@ -35,22 +40,58 @@ defmodule Mix.Tasks.MediaSync do
          :ok <- check_stat(stat),
          {:ok, tag} <- TagReader.read_file(file_path) do
       attrs = Song.from_file(file_path, stat, tag)
-      sync(attrs)
+      artist_names = List.wrap(tag.artist)
+
+      Multi.new()
+      |> sync_artists(artist_names)
+      |> sync_song(attrs)
+      |> sync_song_artists(artist_names)
+      |> Repo.transaction()
     end
   end
 
-  def sync(attrs) do
+  def sync_song(multi, attrs) do
     md5_hash = attrs[:md5_hash]
 
-    result =
+    changeset =
       md5_hash
       |> get_song()
       |> Song.changeset(attrs)
-      |> Repo.insert_or_update()
 
-    case result do
-      {:ok, _} -> {:ok, md5_hash}
-      error -> error
+    Multi.insert_or_update(multi, :insert_or_update_song, changeset)
+  end
+
+  def sync_artists(multi, artist_names) do
+    Enum.reduce(artist_names, multi, fn name, multi ->
+      changeset = get_artist(name) |> Artist.changeset(%{})
+      Multi.insert_or_update(multi, {:artist, name}, changeset)
+    end)
+  end
+
+  def sync_song_artists(multi, artist_names) do
+    multi =
+      Multi.delete_all(
+        multi,
+        :delete_all_song_artists,
+        fn %{insert_or_update_song: song} ->
+          where(SongArtist, [sa], sa.song_id == ^song.id)
+        end
+      )
+
+    Enum.reduce(artist_names, multi, fn name, multi ->
+      Multi.insert(multi, {:insert_song_artist, name}, fn data ->
+        artist = data[{:artist, name}]
+        song = data.insert_or_update_song
+        # TODO: use changeset
+        %SongArtist{artist_id: artist.id, song_id: song.id}
+      end)
+    end)
+  end
+
+  def get_artist(name) do
+    case Repo.get_by(Artist, name: name) do
+      nil -> %Artist{name: name}
+      artist -> artist
     end
   end
 
@@ -70,8 +111,6 @@ defmodule Mix.Tasks.MediaSync do
   end
 
   def cleanup(hashes) do
-    import Ecto.Query
-
     Song
     |> where([s], s.md5_hash not in ^hashes)
     |> Repo.delete_all()

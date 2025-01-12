@@ -136,7 +136,7 @@ defmodule Taiko.Tag do
       artist: json["Artist"],
       track_number: json["TrackNumber"],
       disc_number: json["Discnumber"],
-      year: json["Date"],
+      year: json["Year"],
       picture_mime: json["PictureMIMEType"],
       picture_data: json["Picture"],
       duration: parse_float(json["Duration"])
