@@ -127,6 +127,15 @@ defmodule Taiko.Tag do
   end
 
   def from(%{"FileType" => "FLAC"} = json) do
+    # Possible formats:
+    # - "2024-12-31"
+    # - 2024
+    year =
+      case json["Date"] do
+        <<year::binary-size(4), _::binary>> -> parse_integer(year)
+        year -> parse_integer(year)
+      end
+
     tag = %__MODULE__{
       bitrate: json["SampleRate"],
       comment: json["Description"],
@@ -136,10 +145,10 @@ defmodule Taiko.Tag do
       artist: json["Artist"],
       track_number: json["TrackNumber"],
       disc_number: json["Discnumber"],
-      year: json["Year"],
+      year: year,
       picture_mime: json["PictureMIMEType"],
       picture_data: json["Picture"],
-      duration: parse_float(json["Duration"])
+      duration: flac_duration(json["Duration"])
     }
 
     {:ok, tag}
@@ -147,6 +156,27 @@ defmodule Taiko.Tag do
 
   def from(_json) do
     {:error, :unknown_file_type}
+  end
+
+  @doc """
+  Possible formats:
+  - "0:03:33"
+  - "14.04 s"
+  """
+  def flac_duration(data) do
+    str = to_string(data)
+
+    case Regex.run(~r"(\d+):(\d+):(\d+)", str) do
+      [_, hours, minutes, seconds] ->
+        [seconds, minutes, hours]
+        |> Enum.map(&parse_integer/1)
+        |> Enum.with_index()
+        |> Enum.reject(&is_nil/1)
+        |> Enum.reduce(0, fn {num, idx}, acc -> acc + num * 60 ** idx end)
+
+      _ ->
+        parse_float(data)
+    end
   end
 
   @doc """
