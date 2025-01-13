@@ -41,7 +41,7 @@ defmodule Taiko.MediaLibrary.Song do
 
   def from_file(file_path, stat, tag) do
     %{
-      name: tag.title,
+      name: to_string(tag.title),
       year: tag.year,
       duration: ceil(tag.duration),
       bitrate: tag.bitrate,
