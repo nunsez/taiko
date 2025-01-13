@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS "schema_migrations" ("version" INTEGER PRIMARY KEY, "inserted_at" TEXT);
+CREATE TABLE IF NOT EXISTS "users" ("id" TEXT PRIMARY KEY, "email" TEXT NOT NULL COLLATE NOCASE, "hashed_password" TEXT NOT NULL, "inserted_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL);
+CREATE UNIQUE INDEX "users_email_index" ON "users" ("email");
+CREATE TABLE IF NOT EXISTS "users_tokens" ("id" TEXT PRIMARY KEY, "user_id" TEXT NOT NULL CONSTRAINT "users_tokens_user_id_fkey" REFERENCES "users"("id") ON DELETE CASCADE, "token" BLOB NOT NULL, "context" TEXT NOT NULL, "sent_to" TEXT, "inserted_at" TEXT NOT NULL);
+CREATE INDEX "users_tokens_user_id_index" ON "users_tokens" ("user_id");
+CREATE UNIQUE INDEX "users_tokens_context_token_index" ON "users_tokens" ("context", "token");
+CREATE TABLE IF NOT EXISTS "artists" ("id" TEXT PRIMARY KEY, "name" TEXT, "inserted_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL);
+CREATE UNIQUE INDEX "artists_name_index" ON "artists" ("name");
+CREATE TABLE IF NOT EXISTS "songs" ("id" TEXT PRIMARY KEY, "name" TEXT, "duration" INTEGER, "bitrate" INTEGER, "disc_number" INTEGER, "track_number" INTEGER, "year" INTEGER, "picture_data" TEXT, "picture_mime" TEXT, "file_path" TEXT, "file_size" INTEGER, "md5_hash" TEXT, "inserted_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL);
+CREATE UNIQUE INDEX "songs_md5_hash_index" ON "songs" ("md5_hash");
+CREATE TABLE IF NOT EXISTS "song_artists" ("id" TEXT PRIMARY KEY, "artist_id" TEXT CONSTRAINT "song_artists_artist_id_fkey" REFERENCES "artists"("id"), "song_id" TEXT CONSTRAINT "song_artists_song_id_fkey" REFERENCES "songs"("id"), "inserted_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL);
+CREATE INDEX "song_artists_artist_id_index" ON "song_artists" ("artist_id");
+CREATE INDEX "song_artists_song_id_index" ON "song_artists" ("song_id");
+INSERT INTO schema_migrations VALUES(20241226024742,'2025-01-13T14:45:58');
+INSERT INTO schema_migrations VALUES(20241230060200,'2025-01-13T14:45:58');
+INSERT INTO schema_migrations VALUES(20241230070603,'2025-01-13T14:45:58');
+INSERT INTO schema_migrations VALUES(20250112110649,'2025-01-13T14:45:58');
