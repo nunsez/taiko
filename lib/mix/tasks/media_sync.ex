@@ -96,19 +96,35 @@ defmodule Mix.Tasks.MediaSync do
   end
 
   def sync_song_artists(song, artists) do
-    # TODO: optimize to not to delete_all
-    SongArtist
-    |> where([sa], sa.song_id == ^song.id)
-    |> Repo.delete_all()
+    fresh_artist_ids = Enum.map(artists, fn artist -> artist.id end)
 
-    artists
-    |> Enum.map(fn artist -> sync_song_artist(song, artist) end)
-    |> check_list()
+    existing_artist_ids =
+      SongArtist
+      |> where([sa], sa.song_id == ^song.id)
+      |> select([sa], sa.artist_id)
+      |> Repo.all()
+
+    to_remove = existing_artist_ids -- fresh_artist_ids
+    to_create = fresh_artist_ids -- existing_artist_ids
+
+    if Enum.any?(to_remove) do
+      SongArtist
+      |> where([sa], sa.song_id == ^song.id and sa.artist_id in ^to_remove)
+      |> Repo.delete_all()
+    end
+
+    if Enum.any?(to_create) do
+      to_create
+      |> Enum.map(fn artist_id -> sync_song_artist(song.id, artist_id) end)
+      |> check_list()
+    else
+      {:ok, []}
+    end
   end
 
-  def sync_song_artist(song, artist) do
+  def sync_song_artist(song_id, artist_id) do
     %SongArtist{}
-    |> SongArtist.changeset(%{artist_id: artist.id, song_id: song.id})
+    |> SongArtist.changeset(%{song_id: song_id, artist_id: artist_id})
     |> Repo.insert()
   end
 
