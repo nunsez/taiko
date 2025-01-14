@@ -2,6 +2,7 @@ defmodule Taiko.MediaLibrary.SongArtist do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Taiko.Repo
   alias Taiko.MediaLibrary.Artist
   alias Taiko.MediaLibrary.Song
 
@@ -14,10 +15,14 @@ defmodule Taiko.MediaLibrary.SongArtist do
     timestamps(type: :utc_datetime)
   end
 
+  @required [:artist_id, :song_id]
+
   @doc false
   def changeset(song_artist, attrs) do
     song_artist
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, @required)
+    |> validate_required(@required)
+    |> unsafe_validate_unique([:artist_id, :song_id], Repo)
+    |> unique_constraint([:artist_id, :song_id])
   end
 end

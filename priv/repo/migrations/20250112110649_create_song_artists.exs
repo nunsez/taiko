@@ -12,5 +12,6 @@ defmodule Taiko.Repo.Migrations.CreateSongArtists do
 
     create index(:song_artists, [:artist_id])
     create index(:song_artists, [:song_id])
+    create unique_index(:song_artists, [:song_id, :artist_id])
   end
 end
