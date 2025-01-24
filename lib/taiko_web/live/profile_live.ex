@@ -1,8 +1,9 @@
 defmodule TaikoWeb.ProfileLive do
   use TaikoWeb, :live_view
 
-  alias Taiko.Repo
+  alias Taiko.Accounts
   alias Taiko.MediaLibrary.Song
+  alias Taiko.Repo
 
   def render(assigns) do
     ~H"""

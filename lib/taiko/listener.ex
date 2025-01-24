@@ -1,6 +1,8 @@
 defmodule Taiko.Listener do
   use GenServer
 
+  alias Taiko.MediaLibrary
+
   @run_cmd :run_sync
 
   @default_interval :timer.seconds(5)
@@ -34,13 +36,13 @@ defmodule Taiko.Listener do
 
     cond do
       member?(events, [:deleted, :moved_from]) ->
-        {:noreply, delete(state, path)}
+        {:noreply, update_buffer(state, :delete, path)}
 
       member?(events, [:created, :moved_to]) ->
-        {:noreply, create(state, path)}
+        {:noreply, update_buffer(state, :create, path)}
 
       member?(events, [:modified]) ->
-        {:noreply, update(state, path)}
+        {:noreply, update_buffer(state, :update, path)}
 
       true ->
         {:noreply, state}
@@ -51,11 +53,7 @@ defmodule Taiko.Listener do
     Enum.any?(wanted_events, fn wanted -> MapSet.member?(incoming_events, wanted) end)
   end
 
-  def delete(state, path), do: update_buffer(state, :delete, path)
 
-  def create(state, path), do: update_buffer(state, :create, path)
-
-  def update(state, path), do: update_buffer(state, :update, path)
 
   defp make_buffer do
     %{

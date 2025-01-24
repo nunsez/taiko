@@ -4,8 +4,8 @@ defmodule Taiko.Repo.Migrations.CreateSongArtists do
   def change do
     create table(:song_artists, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :artist_id, references(:artists, on_delete: :nothing, type: :binary_id)
-      add :song_id, references(:songs, on_delete: :nothing, type: :binary_id)
+      add :artist_id, references(:artists, on_delete: :delete_all, type: :binary_id)
+      add :song_id, references(:songs, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end
