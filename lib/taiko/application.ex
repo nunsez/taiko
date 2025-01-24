@@ -1,11 +1,12 @@
 defmodule Taiko.Application do
+  # credo:disable-for-previous-line Credo.Check.Refactor.ModuleDependencies
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
 
   use Application
 
-  @impl true
+  @impl Application
   def start(_type, _args) do
     children = [
       TaikoWeb.Telemetry,
@@ -16,6 +17,7 @@ defmodule Taiko.Application do
       {Phoenix.PubSub, name: Taiko.PubSub},
       # Start a worker by calling: Taiko.Worker.start_link(arg)
       # {Taiko.Worker, arg},
+      {Task.Supervisor, name: Taiko.ListenerSupervisor},
       # Start to serve requests, typically the last entry
       TaikoWeb.Endpoint
     ]
@@ -30,13 +32,13 @@ defmodule Taiko.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
+  @impl Application
   def config_change(changed, _new, removed) do
     TaikoWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 
-  defp skip_migrations?() do
+  defp skip_migrations? do
     # By default, sqlite migrations are run when using a release
     System.get_env("RELEASE_NAME") != nil
   end

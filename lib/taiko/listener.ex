@@ -26,7 +26,10 @@ defmodule Taiko.Listener do
     {:ok, state}
   end
 
-  def handle_info(@run_cmd, state) do
+  def handle_info(@run_cmd, %{buffer: buffer} = state) do
+    start_job(fn -> MediaLibrary.delete(MapSet.to_list(buffer[:delete])) end)
+    start_job(fn -> MediaLibrary.update(MapSet.to_list(buffer[:update])) end)
+    start_job(fn -> MediaLibrary.create(MapSet.to_list(buffer[:create])) end)
     run_after_delay(state)
     {:noreply, flush(state)}
   end
@@ -49,11 +52,18 @@ defmodule Taiko.Listener do
     end
   end
 
+  # fallback
+  def handle_info(_msg, state) do
+    {:noreply, state}
+  end
+
+  def start_job(f) when is_function(f, 0) do
+    Task.Supervisor.async(Taiko.ListenerSupervisor, fn -> f.() end)
+  end
+
   defp member?(%MapSet{} = incoming_events, wanted_events) do
     Enum.any?(wanted_events, fn wanted -> MapSet.member?(incoming_events, wanted) end)
   end
-
-
 
   defp make_buffer do
     %{

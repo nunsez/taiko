@@ -4,9 +4,28 @@ defmodule Taiko.Accounts do
   """
 
   import Ecto.Query, warn: false
+
+  alias Taiko.Accounts.User
+  alias Taiko.Accounts.UserToken
   alias Taiko.Repo
 
-  alias Taiko.Accounts.{User, UserToken}
+  @pubsub Taiko.PubSub
+
+  def subscribe(user_id) do
+    Phoenix.PubSub.subscribe(@pubsub, topic(user_id))
+  end
+
+  def unsubscribe(user_id) do
+    Phoenix.PubSub.unsubscribe(@pubsub, topic(user_id))
+  end
+
+  def broadcast!(user_id, message) do
+    Phoenix.PubSub.broadcast!(@pubsub, topic(user_id), {__MODULE__, message})
+  end
+
+  defp topic(user_id) do
+    "user:#{user_id}"
+  end
 
   ## Database getters
 

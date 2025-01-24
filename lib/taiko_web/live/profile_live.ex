@@ -11,7 +11,7 @@ defmodule TaikoWeb.ProfileLive do
       <h1>Profile Live</h1>
 
       <ul>
-        <%= for song <- @songs do %>
+        <%= for {_id, song} <- @streams.songs do %>
           <li phx-click={JS.push("play", value: %{id: song.id})}>
             {song.name}
           </li>
@@ -22,8 +22,14 @@ defmodule TaikoWeb.ProfileLive do
   end
 
   def mount(_params, _session, socket) do
+    %{current_user: current_user} = socket.assigns
+
+    if connected?(socket) do
+      Accounts.subscribe(current_user.id)
+    end
+
     songs = Repo.all(Song)
-    socket = assign(socket, songs: songs)
+    socket = stream(socket, :songs, songs)
     {:ok, socket, []}
   end
 
@@ -45,5 +51,11 @@ defmodule TaikoWeb.ProfileLive do
       })
 
     push_event(socket, "play2", %{token: token})
+  end
+
+  def handle_info({Accounts, :library_update}, socket) do
+    songs = Repo.all(Song)
+    socket = stream(socket, :songs, songs)
+    {:noreply, socket}
   end
 end
