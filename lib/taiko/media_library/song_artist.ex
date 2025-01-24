@@ -12,7 +12,7 @@ defmodule Taiko.MediaLibrary.SongArtist do
     belongs_to :artist, Artist
     belongs_to :song, Song
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   @required [:artist_id, :song_id]

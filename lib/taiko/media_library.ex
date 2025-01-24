@@ -63,7 +63,7 @@ defmodule Taiko.MediaLibrary do
   def broadcast_library_update do
     User
     |> select([u], u.id)
-    |> Repo.all
+    |> Repo.all()
     |> Enum.each(fn user_id -> Accounts.broadcast!(user_id, :library_update) end)
   end
 

@@ -7,7 +7,7 @@ defmodule Taiko.Repo.Migrations.CreateSongArtists do
       add :artist_id, references(:artists, on_delete: :delete_all, type: :binary_id)
       add :song_id, references(:songs, on_delete: :delete_all, type: :binary_id)
 
-      timestamps(type: :utc_datetime)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create index(:song_artists, [:artist_id])

@@ -9,7 +9,7 @@ import Config
 
 config :taiko,
   ecto_repos: [Taiko.Repo],
-  generators: [timestamp_type: :utc_datetime, binary_id: true]
+  generators: [timestamp_type: :utc_datetime_usec, binary_id: true]
 
 # Configures the endpoint
 config :taiko, TaikoWeb.Endpoint,

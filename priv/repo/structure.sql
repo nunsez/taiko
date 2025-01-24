@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "song_artists" ("id" TEXT PRIMARY KEY, "artist_id" TE
 CREATE INDEX "song_artists_artist_id_index" ON "song_artists" ("artist_id");
 CREATE INDEX "song_artists_song_id_index" ON "song_artists" ("song_id");
 CREATE UNIQUE INDEX "song_artists_song_id_artist_id_index" ON "song_artists" ("song_id", "artist_id");
-INSERT INTO schema_migrations VALUES(20241226024742,'2025-01-24T03:52:42');
-INSERT INTO schema_migrations VALUES(20241230060200,'2025-01-24T03:52:42');
-INSERT INTO schema_migrations VALUES(20241230070603,'2025-01-24T03:52:42');
-INSERT INTO schema_migrations VALUES(20250112110649,'2025-01-24T03:52:42');
+INSERT INTO schema_migrations VALUES(20241226024742,'2025-01-24T17:51:44');
+INSERT INTO schema_migrations VALUES(20241230060200,'2025-01-24T17:51:44');
+INSERT INTO schema_migrations VALUES(20241230070603,'2025-01-24T17:51:44');
+INSERT INTO schema_migrations VALUES(20250112110649,'2025-01-24T17:51:44');

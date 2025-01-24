@@ -16,7 +16,7 @@ defmodule Taiko.Repo.Migrations.CreateSongs do
       add :file_size, :integer
       add :md5_hash, :string
 
-      timestamps(type: :utc_datetime)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create unique_index(:songs, [:md5_hash])

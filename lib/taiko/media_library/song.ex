@@ -24,7 +24,7 @@ defmodule Taiko.MediaLibrary.Song do
 
     many_to_many :artists, Artist, join_through: SongArtist
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime_usec)
   end
 
   @required [:name, :file_path, :file_size, :md5_hash]
