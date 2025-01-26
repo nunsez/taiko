@@ -78,20 +78,10 @@ defmodule Taiko.MediaLibrary do
     end
   end
 
-  def check_list(list) do
-    {status, list} =
-      Enum.reduce(list, {:ok, []}, fn
-        {:ok, value}, {:ok, acc} -> {:ok, [value | acc]}
-        {_, value}, {_, acc} -> {:error, [value | acc]}
-      end)
-
-    {status, Enum.reverse(list)}
-  end
-
   def sync_artists(artist_names) do
     artist_names
     |> Enum.map(&sync_artist/1)
-    |> check_list()
+    |> Taiko.sequence()
   end
 
   def sync_artist(artist_name) do
@@ -129,7 +119,7 @@ defmodule Taiko.MediaLibrary do
     if Enum.any?(to_create) do
       to_create
       |> Enum.map(fn artist_id -> sync_song_artist(song.id, artist_id) end)
-      |> check_list()
+      |> Taiko.sequence()
     else
       {:ok, []}
     end
